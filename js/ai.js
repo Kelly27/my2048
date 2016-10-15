@@ -1,10 +1,9 @@
 function AI(grid) {
   this.grid = grid;
   this.weight = this.setWeight();
-  this.input = this.setInput();
+//  this.input = this.setInput();
 }
-// teseting github
-
+/*
 //setInput
 AI.prototype.setInput = function(){
     var input = new Array(4);
@@ -18,11 +17,11 @@ AI.prototype.setInput = function(){
                /* var k =0;
                 while(v>2){
                 v >>=1;
-                k+=1;*/
+                k+=1;
             }
         }
-    input[0][0] = 2;
-    input[3][3] = 2;
+    //input[0][0] = 2;
+    //input[3][3] = 2;
 
     return input;
 }
@@ -31,7 +30,7 @@ AI.prototype.setInput = function(){
 
 AI.prototype.getInput=function(){
     return this.input;
-}
+}*/
 AI.prototype.setWeight = function(){
     //generate weight
     var weight = new Array(30);
@@ -60,7 +59,7 @@ AI.prototype.calcRvalue1 = function(input, weight) {
     for(var i =0; i<30; i++){
         var a = 0;
         for(var j=0; j<16; j++){
-            a += Math.round((weight[i][j] * input[i][j]) *100) / 100;
+            a += Math.round((weight[i][j] * input[j]) *100) / 100;
             sum[i] = a;
             
         }
@@ -87,7 +86,8 @@ AI.prototype.getBest = function() {
 
   //r value in array for the equation 1/(1+e^-r) [input-hidden]
   var r = new Array(30);
-  r = this.calcRvalue1(this.getInput(), this.getWeight());
+  r = this.calcRvalue1(input, this.getWeight());
+  // r = this.calcRvalue1(this.getInput(), this.getWeight());
 
   console.log("hidden value");
   //get hidden value where hidden = 1/(1+e^-r)
