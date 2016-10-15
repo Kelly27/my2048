@@ -6,16 +6,18 @@ function AI(grid) {
 
 //setInput
 AI.prototype.setInput = function(){
-    //var g = this.grid.clone();
     var input = new Array (16);
+    for(var k = 0; k < 16; k++){
       for(var i=0; i < 4; i++){
         for(var j=0; j < 4; j++){
-            input = this.grid.cells[i][j];
-            console.log(input);
+          input[k]=this.grid.cellContent({x:j, y:i});
+          console.log(input[k]);
+        }
+        input[k]= this.grid.cellContent({x:j, y:i});
+        console.log(input[k]);
       }
-      //console.log(input);
-      return input;
     }
+    return input;
 }
     
 
