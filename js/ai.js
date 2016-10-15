@@ -3,6 +3,7 @@ function AI(grid) {
   this.weight = this.setWeight();
   this.input = this.setInput();
 }
+// teseting github
 
 //setInput
 AI.prototype.setInput = function(){
@@ -82,7 +83,7 @@ AI.prototype.getBest = function() {
   var hidden = [];
   var output = [];
 
-  this.setInput();
+  //this.setInput();
 
   //r value in array for the equation 1/(1+e^-r) [input-hidden]
   var r = new Array(30);
