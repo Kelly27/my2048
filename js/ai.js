@@ -6,17 +6,23 @@ function AI(grid) {
 
 //setInput
 AI.prototype.setInput = function(){
-    var input = new Array (16);
-    for(var k = 0; k < 16; k++){
+    var input =[];
       for(var i=0; i < 4; i++){
+        //input[i] = new Array(4);
         for(var j=0; j < 4; j++){
-          input[k]=this.grid.cellContent({x:j, y:i});
-          console.log(input[k]);
+          if(this.grid.cells[j][i] !== null){
+            var v = this.grid.cells[j][i].value;
+            console.log(v);
+            input = input.concat(v);
+          }
+          else{
+            v = 0;
+            input = input.concat(v);
+          }
         }
-        input[k]= this.grid.cellContent({x:j, y:i});
-        console.log(input[k]);
       }
-    }
+    input = input.concat(1);
+    console.log(input);
     return input;
 }
     
@@ -29,11 +35,11 @@ AI.prototype.setWeight = function(){
     //generate weight
     var weight = new Array(30);
     for (var i = 0; i < 30; i++) {
-        weight[i] = new Array(16);
+        weight[i] = new Array(17);
     }
   
     for (var i = 0; i <30; i++) {
-        for (var j = 0; j <16; j++) {
+        for (var j = 0; j <17; j++) {
             weight[i][j] = Math.round((Math.random()*2-1) *100) / 100;
                 console.log("weight: " + weight[i][j]);        
         }
@@ -52,7 +58,7 @@ AI.prototype.calcRvalue1 = function(input, weight) {
     console.log("r value:")
     for(var i =0; i<30; i++){
         var a = 0;
-        for(var j=0; j<16; j++){
+        for(var j=0; j<17; j++){
             a += Math.round((weight[i][j] * input[j]) *100) / 100;
             sum[i] = a;
             
