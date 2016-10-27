@@ -1,103 +1,168 @@
-function AI(grid) {
+function AI(grid,prevInput) {
   this.grid = grid;
-  this.weight = this.setWeight();
-//  this.input = this.setInput();
+  this.prevInput = prevInput;
+  this.weight1 = this.setWeight1();
+  this.weight2 = this.setWeight2();
 }
 
 //setInput
 AI.prototype.setInput = function(){
-    var input = new Array (16);
-    for(var k = 0; k < 16; k++){
-      for(var i=0; i < 4; i++){
-        for(var j=0; j < 4; j++){
-          input[k]=this.grid.cellContent({x:j, y:i});
-          console.log(input[k]);
+  var input =[];
+    for(var i=0; i < 4; i++){
+      //input[i] = new Array(4);
+      for(var j=0; j < 4; j++){
+        if(this.grid.cells[j][i] !== null){
+          var v = this.grid.cells[j][i].value;
+          console.log(v);
+          input = input.concat(v);
         }
-        input[k]= this.grid.cellContent({x:j, y:i});
-        console.log(input[k]);
+        else{
+          v = 0;
+          input = input.concat(v);
+        }
       }
     }
-    return input;
+  input = input.concat(1);
+  console.log(input);
+  return input;
 }
     
+//setInputTemp
+/*AI.prototype.setprevInput = function(){
 
+  var prevInput = [];
 
-AI.prototype.getInput=function(){
-    return this.input;
-}
-AI.prototype.setWeight = function(){
-    //generate weight
-    var weight = new Array(30);
-    for (var i = 0; i < 30; i++) {
-        weight[i] = new Array(16);
-    }
+  if(prevInput == null){
+    prevInput = this.setInput();
+  }
+  else if (prevInput != input){
+    prevInput = this.setInput();
+  }
+  else if (prevInput == input){
+
+  }
   
-    for (var i = 0; i <30; i++) {
-        for (var j = 0; j <16; j++) {
-            weight[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-                console.log("weight: " + weight[i][j]);        
-        }
-    }
-    return weight;   
+  return prevInput;
+}*/
+
+AI.prototype.getInput = function(){
+  return this.input;
 }
 
-AI.prototype.getWeight = function(){
-    return this.weight;
+AI.prototype.setWeight1 = function(){
+  //generate weight
+  var weight1 = new Array(30);
+  for (var i = 0; i < 30; i++) {
+    weight1[i] = new Array(17);
+  }
+
+  for (var i = 0; i <30; i++) {
+    for (var j = 0; j <17; j++) {
+      weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
+      console.log("weight1: " + weight1[i][j]);        
+    }
+  }
+  return weight1;   
+}
+
+AI.prototype.setWeight2 = function(){
+  //generate weight
+  var weight2 = new Array(4);
+  for (var i = 0; i < 4; i++) {
+    weight2[i] = new Array(30);
+  }
+
+  for (var i = 0; i <4; i++) {
+    for (var j = 0; j <30; j++) {
+      weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
+      console.log("weight2: " + weight2[i][j]);        
+  }
+  }
+  return weight2;   
+}
+
+AI.prototype.getWeight1 = function(){
+  return this.weight1;
+}
+
+AI.prototype.getWeight2 = function(){
+  return this.weight2;
 }
 
 //calculate r value for input-hidden
-AI.prototype.calcRvalue1 = function(input, weight) {
+AI.prototype.calcRvalue1 = function(input, weight1) {
   var sum = new Array (30);
-
-    console.log("r value:")
-    for(var i =0; i<30; i++){
-        var a = 0;
-        for(var j=0; j<16; j++){
-            a += Math.round((weight[i][j] * input[j]) *100) / 100;
-            sum[i] = a;
-            
-        }
-        console.log(a);
+  console.log("r value:")
+  for(var i =0; i<30; i++){
+    var a = 0;
+    for(var j=0; j<17; j++){
+      a += Math.round((weight1[i][j] * input[j]) *100) / 100;
+      sum[i] = a;        
     }
-    return sum;
-}
-//calculate r value for hidden-output
-AI.prototype.calcRvalue2 = function(hidden) {
-  var sum = 0;
-    for (var j = 0; j < hidden.length; j++) {
-      sum = hidden[j]*  Math.round((Math.random()*2-1) *100) / 100;
-      sum = Math.round(sum*100)/100;
-    }     
+    console.log(a);
+  }
   return sum;
 }
 
+//calculate r value for hidden-output
+AI.prototype.calcRvalue2 = function(hidden, weight2) {
+  var sum = new Array (4);
+  console.log("r value 2:")
+  for(var i =0; i<4; i++){
+    var a = 0;
+    for(var j=0; j<30; j++){
+      a += Math.round((weight2[i][j] * hidden[j]) *100) / 100;
+      sum[i] = a;
+    }
+    console.log(a);
+  }
+  return sum;
+}
+
+AI.prototype.checkValidMove = function(input, prevInput){ //////////////////////////////
+  var flag = true;
+  for (var i = 0; i < input.length; i++) {
+    if (prevInput[i] !== input[i]){  //input different, valid move
+      flag = true;
+      console.log("not same - prevInput[i]: " + prevInput[i] + "input" + input[i]);
+      console.log(flag);
+      break;
+    }
+    else if (prevInput[i] === input[i]){
+      flag = false;//invalid move
+      console.log("same - prevInput[i]: " + prevInput[i] + "input" + input[i]);
+      console.log(flag);
+
+    }
+  }
+  return flag;
+}
+
 AI.prototype.getBest = function() {
-  //var input = [2, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 2];
   var hidden = [];
   var output = [];
-
   var input = this.setInput();
+
+  //var prevInput = [];
 
   //r value in array for the equation 1/(1+e^-r) [input-hidden]
   var r = new Array(30);
-  r = this.calcRvalue1(input, this.getWeight());
+  r = this.calcRvalue1(input, this.getWeight1());
 
   console.log("hidden value");
   //get hidden value where hidden = 1/(1+e^-r)
   for(var i=0; i < r.length; i++){
-      hidden[i] = 1/(1+Math.exp(-r[i]));
-      hidden[i] = Math.round(hidden[i]*100)/100;
-      console.log(hidden[i]);
+    hidden[i] = 1/(1+Math.exp(-r[i]));
+    hidden[i] = Math.round(hidden[i]*100)/100;
+    console.log(hidden[i]);
   }
 
-  console.log("r value(hidden)");
+  //console.log("r value(hidden)");
 
   //r value in array for the equation 1/(1+e^-r) [hidden-output]
   var r2 = new Array(4);
-  for(var i=0; i < r2.length; i++){
-      r2[i] = this.calcRvalue2(hidden);
-      console.log(r2[i]);
-  }
+  r2= this.calcRvalue2(hidden, this.getWeight2());
+  console.log(r2);
 
   console.log("output");
   //get output value where output = 1/(1+e^-r)
@@ -106,13 +171,29 @@ AI.prototype.getBest = function() {
       output[i]=Math.round(output[i]*100)/100;
       console.log(output[i]);
   }
-
-  ////direction-sort biggest value in array m
-  var m = output.indexOf(Math.max(...output));
-  console.log("max output: " + m);
-
-  return {move:[m]}; //KELLY: change the array index to change direction
+  
+  //check next valid move
+  if(this.prevInput== null|| this.checkValidMove(input, this.prevInput) == true){ //valid move
+    console.log("prev: " + this.prevInput + " is null or not same");
+    this.prevInput = input;
+    console.log("new previnput: " + this.prevInput);
+    ////direction-sort biggest value in array m
+    var m = output.indexOf(Math.max(...output));
+    console.log("max output: " + m);
+    return {move:[m]};
+  }
+  else{ // invalid move, attempt 2nd biggest output
+    //console.log(this.checkValidMove(input, this.prevInput));
+    console.log("prev: " + this.prevInput + " is same with input" + input);
+    output.splice(output.indexOf(Math.max(...output)), 1); // remove max from the array
+    var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
+    console.log("2nd max output: " + m2);
+    return {move:[m2]};
+  }
+ 
 }
+
+
 AI.prototype.translate = function(move) {
  return {
     0: 'up',
@@ -121,3 +202,10 @@ AI.prototype.translate = function(move) {
     3: 'left'
   }[move];
 }
+
+
+/*
+temp = a;
+a = b; 
+b = temp;
+*/
