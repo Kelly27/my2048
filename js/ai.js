@@ -26,24 +26,6 @@ AI.prototype.setInput = function(){
   console.log(input);
   return input;
 }
-    
-//setInputTemp
-/*AI.prototype.setprevInput = function(){
-
-  var prevInput = [];
-
-  if(prevInput == null){
-    prevInput = this.setInput();
-  }
-  else if (prevInput != input){
-    prevInput = this.setInput();
-  }
-  else if (prevInput == input){
-
-  }
-  
-  return prevInput;
-}*/
 
 AI.prototype.getInput = function(){
   return this.input;
@@ -167,7 +149,7 @@ AI.prototype.getBest = function() {
   console.log("output");
   //get output value where output = 1/(1+e^-r)
   for(var i=0; i < r2.length; i++){
-      output[i] = 1/(1+Math.exp(-r[i]));
+      output[i] = 1/(1+Math.exp(-r2[i]));
       output[i]=Math.round(output[i]*100)/100;
       console.log(output[i]);
   }
@@ -183,16 +165,13 @@ AI.prototype.getBest = function() {
     return {move:[m]};
   }
   else{ // invalid move, attempt 2nd biggest output
-    //console.log(this.checkValidMove(input, this.prevInput));
     console.log("prev: " + this.prevInput + " is same with input" + input);
     output.splice(output.indexOf(Math.max(...output)), 1); // remove max from the array
     var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
     console.log("2nd max output: " + m2);
     return {move:[m2]};
   }
- 
 }
-
 
 AI.prototype.translate = function(move) {
  return {
@@ -202,10 +181,3 @@ AI.prototype.translate = function(move) {
     3: 'left'
   }[move];
 }
-
-
-/*
-temp = a;
-a = b; 
-b = temp;
-*/
