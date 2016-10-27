@@ -1,7 +1,6 @@
 function AI(grid) {
   this.grid = grid;
-  this.weight1 = this.setWeight1();
-  this.weight2 = this.setWeight2();
+  this.weight = this.setWeight();
 //  this.input = this.setInput();
 }
 
@@ -32,54 +31,35 @@ AI.prototype.setInput = function(){
 AI.prototype.getInput=function(){
     return this.input;
 }
-AI.prototype.setWeight1 = function(){
+AI.prototype.setWeight = function(){
     //generate weight
-    var weight1 = new Array(30);
+    var weight = new Array(30);
     for (var i = 0; i < 30; i++) {
-        weight1[i] = new Array(17);
+        weight[i] = new Array(17);
     }
   
     for (var i = 0; i <30; i++) {
         for (var j = 0; j <17; j++) {
-            weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-                console.log("weight1: " + weight1[i][j]);        
+            weight[i][j] = Math.round((Math.random()*2-1) *100) / 100;
+                console.log("weight: " + weight[i][j]);        
         }
     }
-    return weight1;   
+    return weight;   
 }
 
-AI.prototype.setWeight2 = function(){
-    //generate weight
-    var weight2 = new Array(4);
-    for (var i = 0; i < 4; i++) {
-        weight2[i] = new Array(30);
-    }
-  
-    for (var i = 0; i <4; i++) {
-        for (var j = 0; j <30; j++) {
-            weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-                console.log("weight2: " + weight2[i][j]);        
-        }
-    }
-    return weight2;   
+AI.prototype.getWeight = function(){
+    return this.weight;
 }
 
-AI.prototype.getWeight1 = function(){
-    return this.weight1;
-}
-
-AI.prototype.getWeight2 = function(){
-    return this.weight2;
-}
 //calculate r value for input-hidden
-AI.prototype.calcRvalue1 = function(input, weight1) {
+AI.prototype.calcRvalue1 = function(input, weight) {
   var sum = new Array (30);
 
     console.log("r value:")
     for(var i =0; i<30; i++){
         var a = 0;
         for(var j=0; j<17; j++){
-            a += Math.round((weight1[i][j] * input[j]) *100) / 100;
+            a += Math.round((weight[i][j] * input[j]) *100) / 100;
             sum[i] = a;
             
         }
@@ -88,24 +68,17 @@ AI.prototype.calcRvalue1 = function(input, weight1) {
     return sum;
 }
 //calculate r value for hidden-output
-AI.prototype.calcRvalue2 = function(hidden, weight2) {
-  var sum = new Array (4);
-
-    console.log("r value 2:")
-    for(var i =0; i<4; i++){
-        var a = 0;
-        for(var j=0; j<30; j++){
-
-            a += Math.round((weight2[i][j] * hidden[j]) *100) / 100;
-            sum[i] = a;
-            
-        }
-        console.log(a);
-    }
-    return sum;
+AI.prototype.calcRvalue2 = function(hidden) {
+  var sum = 0;
+    for (var j = 0; j < hidden.length; j++) {
+      sum = hidden[j]*  Math.round((Math.random()*2-1) *100) / 100;
+      sum = Math.round(sum*100)/100;
+    }     
+  return sum;
 }
 
 AI.prototype.getBest = function() {
+  //var input = [2, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 2];
   var hidden = [];
   var output = [];
 
@@ -113,7 +86,7 @@ AI.prototype.getBest = function() {
 
   //r value in array for the equation 1/(1+e^-r) [input-hidden]
   var r = new Array(30);
-  r = this.calcRvalue1(input, this.getWeight1());
+  r = this.calcRvalue1(input, this.getWeight());
 
   console.log("hidden value");
   //get hidden value where hidden = 1/(1+e^-r)
@@ -123,12 +96,14 @@ AI.prototype.getBest = function() {
       console.log(hidden[i]);
   }
 
-  //console.log("r value(hidden)");
+  console.log("r value(hidden)");
 
   //r value in array for the equation 1/(1+e^-r) [hidden-output]
   var r2 = new Array(4);
-  r2= this.calcRvalue2(hidden, this.getWeight2());
-  console.log(r2);
+  for(var i=0; i < r2.length; i++){
+      r2[i] = this.calcRvalue2(hidden);
+      console.log(r2[i]);
+  }
 
   console.log("output");
   //get output value where output = 1/(1+e^-r)
