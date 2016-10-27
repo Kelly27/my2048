@@ -78,6 +78,7 @@ GameManager.prototype.move = function(direction) {
 
   if (!this.grid.movesAvailable()) {
     this.over = true; // Game over!
+    this.restart(); // game restart by its own 
   }
 
   this.actuate();

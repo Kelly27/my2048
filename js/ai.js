@@ -114,7 +114,6 @@ AI.prototype.checkValidMove = function(input, prevInput){ //////////////////////
       flag = false;//invalid move
       console.log("same - prevInput[i]: " + prevInput[i] + "input" + input[i]);
       console.log(flag);
-
     }
   }
   return flag;
@@ -166,6 +165,7 @@ AI.prototype.getBest = function() {
   }
   else{ // invalid move, attempt 2nd biggest output
     console.log("prev: " + this.prevInput + " is same with input" + input);
+    
     output.splice(output.indexOf(Math.max(...output)), 1); // remove max from the array
     var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
     console.log("2nd max output: " + m2);
