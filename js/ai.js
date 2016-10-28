@@ -1,6 +1,7 @@
-function AI(grid,prevInput) {
+function AI(grid,prevInput,indexM) {
   this.grid = grid;
   this.prevInput = prevInput;
+  this.indexM = indexM; //index to check stuck move
   this.weight1 = this.setWeight1();
   this.weight2 = this.setWeight2();
 }
@@ -160,17 +161,23 @@ AI.prototype.getBest = function() {
     console.log("new previnput: " + this.prevInput);
     ////direction-sort biggest value in array m
     var m = output.indexOf(Math.max(...output));
-    console.log("max output: " + m);
+    console.log("max output: " + m + "indexM: " + this.indexM);
     return {move:[m]};
   }
   else{ // invalid move, attempt 2nd biggest output
     console.log("prev: " + this.prevInput + " is same with input" + input);
-    
-    output.splice(output.indexOf(Math.max(...output)), 1); // remove max from the array
-    var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
-    console.log("2nd max output: " + m2);
-    return {move:[m2]};
-  }
+
+      if(this.indexM == null){
+        this.indexM = 1;
+      }
+      else this.indexM++;
+      
+      output.splice(output.indexOf(Math.max(...output)), 1); // remove max from the array
+      var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
+      console.log("2nd max output: " + m2 + "indexM: " + this.indexM);
+
+      return {move:[m2]};
+    }
 }
 
 AI.prototype.translate = function(move) {
