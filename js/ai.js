@@ -168,7 +168,7 @@ AI.prototype.getBest = function() {
     console.log("prev: " + this.prevInput + " is same with input" + input);
 
       if(this.indexM == null){
-        this.indexM = 1;
+        this.indexM = 0;
       }
       else this.indexM++;
       

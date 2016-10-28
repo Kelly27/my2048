@@ -20,7 +20,7 @@ function GameManager(size, InputManager, Actuator) {
       this.actuator.setRunButton('Auto-run');
     } else {
       this.running = true;
-      this.run()
+      this.run();
       this.actuator.setRunButton('Stop');
     }
   }.bind(this));
@@ -83,7 +83,8 @@ GameManager.prototype.move = function(direction) {
   if(this.ai.indexM == 20){
     this.over = true;
     this.actuator.setRunButton('Auto-run');
-    //this.restart(); // game restart by its own 
+    this.restart(); // game restart by its own 
+    this.run();
   }
 
   this.actuate();
