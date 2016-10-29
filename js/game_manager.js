@@ -78,15 +78,9 @@ GameManager.prototype.move = function(direction) {
 
   if (!this.grid.movesAvailable()) {
     this.over = true; // Game over!
-    //this.restart(); // game restart by its own 
+    var self = this;
+    setTimeout(function(){self.restart();}, 3000);// game restart by its own 
   }
-  if(this.ai.indexM == 20){
-    this.over = true;
-    this.actuator.setRunButton('Auto-run');
-    this.restart(); // game restart by its own 
-    this.run();
-  }
-
   this.actuate();
 }
 
