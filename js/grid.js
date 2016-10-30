@@ -366,7 +366,7 @@ Grid.prototype.islands = function() {
 }
 
 
-/*// measures how smooth the grid is (as if the values of the pieces
+/// measures how smooth the grid is (as if the values of the pieces
 // were interpreted as elevations). Sums of the pairwise difference
 // between neighboring tiles (in log space, so it represents the
 // number of merges that need to happen before they can merge). 
@@ -391,8 +391,8 @@ Grid.prototype.smoothness = function() {
     }
   }
   return smoothness;
-}*/
-/*
+}
+
 Grid.prototype.monotonicity = function() {
   var self = this;
   var marked = [];
@@ -460,9 +460,9 @@ Grid.prototype.monotonicity = function() {
   }
 
   return -increases;
-}*/
+}
 
-/*// measures how monotonic the grid is. This means the values of the tiles are strictly increasing
+// measures how monotonic the grid is. This means the values of the tiles are strictly increasing
 // or decreasing in both the left/right and up/down directions
 Grid.prototype.monotonicity2 = function() {
   // scores for all four directions
@@ -535,7 +535,7 @@ Grid.prototype.maxValue = function() {
   }
 
   return Math.log(max) / Math.log(2);
-}*/
+}
 
 // WIP. trying to favor top-heavy distributions (force consolidation of higher value tiles)
 /*

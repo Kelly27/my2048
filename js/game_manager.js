@@ -34,6 +34,14 @@ GameManager.prototype.restart = function () {
   this.running = false;
   this.actuator.setRunButton('Auto-run');
   this.setup();
+    if (this.running) {
+      this.running = false;
+      this.actuator.setRunButton('Auto-run');
+    } else {
+      this.running = true;
+      this.run();
+      this.actuator.setRunButton('Stop');
+    }
 };
 
 // Set up the game
@@ -81,6 +89,7 @@ GameManager.prototype.move = function(direction) {
     var self = this;
     setTimeout(function(){self.restart();}, 3000);// game restart by its own 
   }
+
   this.actuate();
 }
 
