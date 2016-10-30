@@ -92,7 +92,7 @@ GameManager.prototype.move = function(direction) {
     this.over = true; // Game over!
     this.indexGame++;
 
-    if(this.indexGame <= 2){ // stop at 10th game
+    if(this.indexGame <= 10){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
