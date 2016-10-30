@@ -1,7 +1,11 @@
-function GameManager(size, InputManager, Actuator) {
+function GameManager(size, InputManager, Actuator, indexGame) {
   this.size         = size; // Size of the grid
   this.inputManager = new InputManager;
   this.actuator     = new Actuator;
+
+  this.indexGame = indexGame; //number of game
+
+  this.indexGame = 1;
 
   this.running      = false;
 
@@ -86,10 +90,13 @@ GameManager.prototype.move = function(direction) {
 
   if (!this.grid.movesAvailable()) {
     this.over = true; // Game over!
-    var self = this;
-    setTimeout(function(){self.restart();}, 3000);// game restart by its own 
-  }
+    this.indexGame++;
 
+    if(this.indexGame <= 2){ // stop at 10th game
+      var self = this;
+      setTimeout(function(){self.restart();}, 3000);// game restart by its own 
+    }
+  }
   this.actuate();
 }
 
