@@ -6,11 +6,9 @@ function AI(grid,prevInput,counterAfMax) {  //xiaoli(move)
   this.counterAfMax = 0;     //xiaoli(move)
 }
 
-//setInput
 AI.prototype.setInput = function(){
   var input =[];
     for(var i=0; i < 4; i++){
-      //input[i] = new Array(4);
       for(var j=0; j < 4; j++){
         if(this.grid.cells[j][i] !== null){
           var v = this.grid.cells[j][i].value;
@@ -26,10 +24,6 @@ AI.prototype.setInput = function(){
   input = input.concat(1);
   console.log(input);
   return input;
-}
-
-AI.prototype.getInput = function(){
-  return this.input;
 }
 
 AI.prototype.setWeight1 = function(){

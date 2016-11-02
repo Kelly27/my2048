@@ -38,14 +38,14 @@ GameManager.prototype.restart = function () {
   this.running = false;
   this.actuator.setRunButton('Auto-run');
   this.setup();
-    if (this.running) {
-      this.running = false;
-      this.actuator.setRunButton('Auto-run');
-    } else {
-      this.running = true;
-      this.run();
-      this.actuator.setRunButton('Stop');
-    }
+  if (this.running) {
+    this.running = false;
+    this.actuator.setRunButton('Auto-run');
+  } else {
+    this.running = true;
+    this.run();
+    this.actuator.setRunButton('Stop');
+  }
 };
 
 // Set up the game
@@ -58,7 +58,7 @@ GameManager.prototype.setup = function () {
   this.score        = 0;
   this.over         = false;
   this.won          = false;
-
+  console.log("Game number: " + this.indexGame);
   // Update the actuator
   this.actuate();
 };
@@ -90,19 +90,36 @@ GameManager.prototype.move = function(direction) {
 
   if (!this.grid.movesAvailable()) {
     this.over = true; // Game over!
+    
+    /*
+    access Index of game: gameArr[a]
+    access weight1: gameArr[a][0]
+    access weight2: gameArr[a][1]
+    access score: gameArr[a][2]
+    */
+    var gameArray = new Array(10); 
+    gameArray[this.indexGame] = this.setGameArr()[this.indexGame];
+
+    //console.log("test: " + );
+
     this.indexGame++;
 
     if(this.indexGame <= 10){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
+    //parent selection
+    if(this.indexGame == 10){
+      console.log("Parent - " + this.rouletteSelect());
+    }
   }
+
+  
   this.actuate();
 }
 
 // moves continuously until game is over
 GameManager.prototype.run = function() {
-//  var best = this.ai.getBest();
   var best = this.ai.getBest();
   this.move(best.move);
   var timeout = animationDelay;
@@ -113,3 +130,48 @@ GameManager.prototype.run = function() {
     }, timeout);
   }
 }
+
+GameManager.prototype.setGameArr = function() {
+  var game = new Array (10);
+  for (var i = 1; i <= 10; i++) { 
+    game[i] = new Array(3);
+  };
+  var weight1 = this.ai.getWeight1();
+  var weight2 = this.ai.getWeight2();
+  var score = this.score; 
+  for (var i = 1; i <=10; i++) {
+    game[i][0] = "weight1 test1: " + weight1;
+    game[i][1] = "weight2 test2: " + weight2;
+    game[i][2] = "score:" + score;
+  }
+  //console.log("score test:" + game[0][2]);
+  return game;
+}
+
+GameManager.prototype.rouletteSelect = function (){
+  var fitness = new Array(10);
+  for (var i = 1; i <=10; i++) {
+   fitness[i] = this.setGameArr()[i][2];
+  };
+  var fitness_sum = 0;
+  //calculate sum of all fitness
+  for (var i = 1; i <=10; i++) {
+    fitness_sum+=fitness;
+  }
+
+  // get random value
+  var r = Math.random()*fitness_sum;
+  //console.log(fitness_sum);
+  
+  var F = fitness[1];
+  var k = 1;
+
+  while (F < r){
+    k++;
+    F += fitness(k);
+  }
+
+  var Parent = k;
+  return Parent;
+}
+//"weight1[" + i + "][" + j + "]" +
