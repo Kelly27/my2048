@@ -1,11 +1,14 @@
-function GameManager(size, InputManager, Actuator, indexGame, fitness) {
+function GameManager(size, InputManager, Actuator, indexGame, fitness, gameArray, child1w1, child2w1) {
   this.size         = size; // Size of the grid
   this.inputManager = new InputManager;
   this.actuator     = new Actuator;
 
   this.indexGame = indexGame; //number of game
-  this.fitness = [];
   this.indexGame = 1;
+  this.fitness = [];
+  this.gameArray = new Array (10);
+  this.child1w1 = child1w1;
+  this.child2w1 = child2w1;  
 
   this.running      = false;
 
@@ -98,28 +101,30 @@ GameManager.prototype.move = function(direction) {
     access weight2: gameArr[a][1]
     access score: gameArr[a][2]
     */
-    var gameArray = []; 
-    gameArray[this.indexGame] = this.setGameArr()[this.indexGame];
-
+    
+    this.gameArray[this.indexGame] = this.setGameArr()[this.indexGame];
+    console.log("Check array: " + this.gameArray[this.indexGame]);
     this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
 
-    if(this.indexGame <= 2){ // stop at 10th game
+    if(this.indexGame <= 3){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
     //parent selection
-    if(this.indexGame == 3){
-      var Parent1 = this.rouletteSelect(this.fitness);
-      var Parent2 = this.rouletteSelect(this.fitness);
-      if(Parent2 == Parent1) Parent2 = this.rouletteSelect(this.fitness);
-      console.log("Parent1 = " + Parent1);
-      console.log("Parent2 = " + Parent2);
-     
+    if(this.indexGame == 4){
+      var parent1 = this.rouletteSelect(this.fitness);
+      var parent2 = this.rouletteSelect(this.fitness);
+
+      while(parent2 == parent1) parent2 = this.rouletteSelect(this.fitness); //make sure the parent are different.
+      console.log("Parent1 = " + parent1);
+      console.log("Parent2 = " + parent2);
+      this.crossOver(parent1, parent2);
+      
     }
   }
-   this.actuator.myConsole("Fitness: "+ this.fitness + "<br>Parent 1: " + Parent1 +  "<br>Parent 2: " + Parent2);
-  
+    this.actuator.myConsole("Fitness: "+ this.fitness + "<br>Parent 1: " + parent1 +  "<br>Parent 2: " + parent2);
+    
   this.actuate();
 }
 
@@ -145,13 +150,13 @@ GameManager.prototype.setGameArr = function() {
   var weight2 = this.ai.getWeight2();
   var score = this.score; 
   for (var i = 1; i <=10; i++) {
-    game[i][0] = "weight1 test1: " + weight1;
-    game[i][1] = "weight2 test2: " + weight2;
+    game[i][0] = weight1;
+    game[i][1] = weight2;
     game[i][2] = score;
   }
-  //console.log("score test:" + game[0][2]);
   return game;
 }
+
 //get data structure score
 GameManager.prototype.setFitness = function(indexGame){
   var i = indexGame;
@@ -174,15 +179,54 @@ GameManager.prototype.rouletteSelect = function (fitness){
   var r = Math.random()*fitness_sum;
   console.log("random" + r);
   
-  var F = fitness[0];
-  var k = 0;
+  var F = fitness[1];
+  var k = 1;
 
   while (F < r){
     k++;
     F += fitness[k];
   }
 
-  var Parent = k;
-  return Parent;
+  var parent = k;
+  return parent;
+}
+
+GameManager.prototype.crossOver = function (parent1, parent2){
+  var p1weight1 = this.gameArray[parent1][0];
+  var p2weight1 = this.gameArray[parent2][0];
+
+  var p1c2 = p1weight1.splice(14); //get out the other half of weight 1
+  var p1c1 = p1weight1;//let the remainder of weight 1 be the chromosome 1
+  var p2c2 = p2weight1.splice(14);
+  var p2c1 = p2weight1; 
+
+  // console.log("check array: " + this.gameArray);
+  // console.log("p1c1: " + p1c1);
+  // console.log("p1c2: " + p1c2);
+  // console.log("p2c1: " + p2c1);
+  // console.log("p2c2: " + p2c2);
+
+  this.child1w1 = p1c1.concat(p2c2);
+  this.child2w1 = p1c2.concat(p2c1);
+
+  //do mutation
+  this.swapMutation(this.child1w1);
+  this.swapMutation(this.child2w1);
+  //return [child1w1, child2w1];  
+}
+
+GameManager.prototype.swapMutation = function(childw1){
+  var r = Math.random();
+  var a = childw1[Math.round(Math.random()*30)];
+  var b = childw1[Math.round(Math.random()*30)];
+  var temp;
+  
+  if(r < 0.05){
+    temp = a;
+    a = b;
+    b = temp;
+    console.log("Mutation done: <br>" + a + "<br>" + b);
+  }
+
 }
 //"weight1[" + i + "][" + j + "]" +
