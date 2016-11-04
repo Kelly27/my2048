@@ -1,10 +1,10 @@
-function GameManager(size, InputManager, Actuator, indexGame) {
+function GameManager(size, InputManager, Actuator, indexGame, fitness) {
   this.size         = size; // Size of the grid
   this.inputManager = new InputManager;
   this.actuator     = new Actuator;
 
   this.indexGame = indexGame; //number of game
-
+  this.fitness = [];
   this.indexGame = 1;
 
   this.running      = false;
@@ -52,13 +52,14 @@ GameManager.prototype.restart = function () {
 GameManager.prototype.setup = function () {
   this.grid         = new Grid(this.size);
   this.grid.addStartTiles();
+  console.log("Game number: " + this.indexGame);
 
   this.ai           = new AI(this.grid);
 
   this.score        = 0;
   this.over         = false;
   this.won          = false;
-  console.log("Game number: " + this.indexGame);
+  
   // Update the actuator
   this.actuate();
 };
@@ -97,23 +98,27 @@ GameManager.prototype.move = function(direction) {
     access weight2: gameArr[a][1]
     access score: gameArr[a][2]
     */
-    var gameArray = new Array(10); 
+    var gameArray = []; 
     gameArray[this.indexGame] = this.setGameArr()[this.indexGame];
 
-    //console.log("test: " + );
-
+    this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
 
-    if(this.indexGame <= 10){ // stop at 10th game
+    if(this.indexGame <= 2){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
     //parent selection
-    if(this.indexGame == 10){
-      console.log("Parent - " + this.rouletteSelect());
+    if(this.indexGame == 3){
+      var Parent1 = this.rouletteSelect(this.fitness);
+      var Parent2 = this.rouletteSelect(this.fitness);
+      if(Parent2 == Parent1) Parent2 = this.rouletteSelect(this.fitness);
+      console.log("Parent1 = " + Parent1);
+      console.log("Parent2 = " + Parent2);
+     
     }
   }
-
+   this.actuator.myConsole("Fitness: "+ this.fitness + "<br>Parent 1: " + Parent1 +  "<br>Parent 2: " + Parent2);
   
   this.actuate();
 }
@@ -142,33 +147,39 @@ GameManager.prototype.setGameArr = function() {
   for (var i = 1; i <=10; i++) {
     game[i][0] = "weight1 test1: " + weight1;
     game[i][1] = "weight2 test2: " + weight2;
-    game[i][2] = "score:" + score;
+    game[i][2] = score;
   }
   //console.log("score test:" + game[0][2]);
   return game;
 }
+//get data structure score
+GameManager.prototype.setFitness = function(indexGame){
+  var i = indexGame;
+  var fitness = this.setGameArr()[i][2];
+  console.log("fitness[" + i + "] = " + fitness);
+  return fitness;
+}
 
-GameManager.prototype.rouletteSelect = function (){
-  var fitness = new Array(10);
-  for (var i = 1; i <=10; i++) {
-   fitness[i] = this.setGameArr()[i][2];
-  };
+GameManager.prototype.rouletteSelect = function (fitness){
+  console.log("fitness array: "+fitness);
   var fitness_sum = 0;
   //calculate sum of all fitness
-  for (var i = 1; i <=10; i++) {
-    fitness_sum+=fitness;
+  for (var i = 0; i <11; i++) {
+    if (fitness[i] == null) fitness[i] = 0;
+    fitness_sum +=fitness[i];
+    console.log("sum = "+fitness_sum);
   }
-
+  
   // get random value
   var r = Math.random()*fitness_sum;
-  //console.log(fitness_sum);
+  console.log("random" + r);
   
-  var F = fitness[1];
-  var k = 1;
+  var F = fitness[0];
+  var k = 0;
 
   while (F < r){
     k++;
-    F += fitness(k);
+    F += fitness[k];
   }
 
   var Parent = k;
