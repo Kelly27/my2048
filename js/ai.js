@@ -1,10 +1,8 @@
-function AI(grid,prevInput,weight1, weight2) {  //xiaoli(move)
+function AI(grid,prevInput,counterAfMax) {  //xiaoli(move)
   this.grid = grid;
   this.prevInput = prevInput;
-  //this.weight1 = this.setWeight1();
-  //this.weight2 = this.setWeight2();
-  this.weight1 = weight1;
-  this.weight2 = weight2;
+  this.weight1 = this.setWeight1();
+  this.weight2 = this.setWeight2();
   this.counterAfMax = 0;     //xiaoli(move)
 }
 
@@ -28,38 +26,37 @@ AI.prototype.setInput = function(){
   return input;
 }
 
-// AI.prototype.setRandWeight1 = function(){
+AI.prototype.setWeight1 = function(){
+  //generate weight
+  var weight1 = new Array(30);
+  for (var i = 0; i < 30; i++) {
+    weight1[i] = new Array(17);
+  }
 
-//   //generate weight
-//   var weight1 = new Array(30);
-//   for (var i = 0; i < 30; i++) {
-//     weight1[i] = new Array(17);
-//   }
+  for (var i = 0; i <30; i++) {
+    for (var j = 0; j <17; j++) {
+      weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
+      console.log("weight1: " + weight1[i][j]);        
+    }
+  }
+  return weight1;   
+}
 
-//   for (var i = 0; i <30; i++) {
-//     for (var j = 0; j <17; j++) {
-//       weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-//       console.log("weight1: " + weight1[i][j]);        
-//     }
-//   }
-//   return weight1;   
-// }
+AI.prototype.setWeight2 = function(){
+  //generate weight
+  var weight2 = new Array(4);
+  for (var i = 0; i < 4; i++) {
+    weight2[i] = new Array(30);
+  }
 
-// AI.prototype.setRandWeight2 = function(){
-//   //generate weight
-//   var weight2 = new Array(4);
-//   for (var i = 0; i < 4; i++) {
-//     weight2[i] = new Array(30);
-//   }
-
-//   for (var i = 0; i <4; i++) {
-//     for (var j = 0; j <30; j++) {
-//       weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-//       console.log("weight2: " + weight2[i][j]);        
-//   }
-//   }
-//   return weight2;   
-// }
+  for (var i = 0; i <4; i++) {
+    for (var j = 0; j <30; j++) {
+      weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
+      console.log("weight2: " + weight2[i][j]);        
+  }
+  }
+  return weight2;   
+}
 
 AI.prototype.getWeight1 = function(){
   return this.weight1;

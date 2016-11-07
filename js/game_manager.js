@@ -4,7 +4,7 @@ function GameManager(size, InputManager, Actuator, indexGame, fitness, gameArray
   this.actuator     = new Actuator;
 
   this.indexGame = indexGame; //number of game
-  this.indexGame = 0;
+  this.indexGame = 1;
   this.fitness = [];
   this.gameArray = new Array (10);
   this.child1w1 = child1w1;
@@ -57,7 +57,7 @@ GameManager.prototype.setup = function () {
   this.grid.addStartTiles();
   console.log("Game number: " + this.indexGame);
 
-  this.ai           = new AI(this.grid, null, this.setRandWeight1(), this.setRandWeight2());
+  this.ai           = new AI(this.grid);
 
   this.score        = 0;
   this.over         = false;
@@ -107,12 +107,12 @@ GameManager.prototype.move = function(direction) {
     this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
 
-    if(this.indexGame <= 9){ // stop at 10th game
+    if(this.indexGame <= 10){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
     //parent selection
-    if(this.indexGame == 10){
+    if(this.indexGame == 11){
       var parent1 = this.rouletteSelect(this.fitness);
       var parent2 = this.rouletteSelect(this.fitness);
 
@@ -141,47 +141,15 @@ GameManager.prototype.run = function() {
   }
 }
 
-GameManager.prototype.setRandWeight1 = function(){
-
-  //generate weight
-  var weight1 = new Array(30);
-  for (var i = 0; i < 30; i++) {
-    weight1[i] = new Array(17);
-  }
-
-  for (var i = 0; i <30; i++) {
-    for (var j = 0; j <17; j++) {
-      weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-      console.log("weight1: " + weight1[i][j]);        
-    }
-  }
-  return weight1;   
-}
-
-GameManager.prototype.setRandWeight2 = function(){
-  //generate weight
-  var weight2 = new Array(4);
-  for (var i = 0; i < 4; i++) {
-    weight2[i] = new Array(30);
-  }
-
-  for (var i = 0; i <4; i++) {
-    for (var j = 0; j <30; j++) {
-      weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-      console.log("weight2: " + weight2[i][j]);        
-    }
-  }
-  return weight2;   
-}
 GameManager.prototype.setGameArr = function() {
   var game = new Array (10);
-  for (var i = 0; i < 10; i++) { 
+  for (var i = 1; i <= 10; i++) { 
     game[i] = new Array(3);
   };
   var weight1 = this.ai.getWeight1();
   var weight2 = this.ai.getWeight2();
   var score = this.score; 
-  for (var i = 0; i <10; i++) {
+  for (var i = 1; i <=10; i++) {
     game[i][0] = weight1;
     game[i][1] = weight2;
     game[i][2] = score;
@@ -201,7 +169,7 @@ GameManager.prototype.rouletteSelect = function (fitness){
   console.log("fitness array: "+fitness);
   var fitness_sum = 0;
   //calculate sum of all fitness
-  for (var i = 0; i <10; i++) {
+  for (var i = 0; i <11; i++) {
     if (fitness[i] == null) fitness[i] = 0;
     fitness_sum +=fitness[i];
     console.log("sum = "+fitness_sum);
@@ -211,8 +179,8 @@ GameManager.prototype.rouletteSelect = function (fitness){
   var r = Math.random()*fitness_sum;
   console.log("random" + r);
   
-  var F = fitness[0];
-  var k = 0;
+  var F = fitness[1];
+  var k = 1;
 
   while (F < r){
     k++;
@@ -226,35 +194,25 @@ GameManager.prototype.rouletteSelect = function (fitness){
 GameManager.prototype.crossOver = function (parent1, parent2){
   var p1weight1 = this.gameArray[parent1][0];
   var p2weight1 = this.gameArray[parent2][0];
-  var p1weight2 = this.gameArray[parent1][1];
-  var p2weight2 = this.gameArray[parent2][1];
-
   // console.log("check array: " + this.gameArray[parent1][0]);
 
-  var p1w1c2 = p1weight1.splice(14); //get out the other half of weight 1
-  var p1w1c1 = p1weight1;//let the remainder of weight 1 be the chromosome 1
-  var p2w1c2 = p2weight1.splice(14);
-  var p2w1c1 = p2weight1; 
+  var p1c2 = p1weight1.splice(14); //get out the other half of weight 1
+  var p1c1 = p1weight1;//let the remainder of weight 1 be the chromosome 1
+  var p2c2 = p2weight1.splice(14);
+  var p2c1 = p2weight1; 
 
-  var p1w2c2 = p1weight2.splice(2); //get out the other half of weight 1
-  var p1w2c1 = p1weight2;//let the remainder of weight 1 be the chromosome 1
-  var p2w2c2 = p2weight2.splice(2);
-  var p2w2c1 = p2weight2; 
+  
   // console.log("p1c1: " + p1c1);
   // console.log("p1c2: " + p1c2);
   // console.log("p2c1: " + p2c1);
   // console.log("p2c2: " + p2c2);
 
-  this.child1w1 = p1w1c1.concat(p2w1c2);
-  this.child1w2 = p1w2c1.concat(p2w2c2);
-  this.child2w1 = p1w1c2.concat(p2w1c1);
-  this.child2w2 = p1w2c2.concat(p2w2c1);
+  this.child1w1 = p1c1.concat(p2c2);
+  this.child2w1 = p1c2.concat(p2c1);
+
   //do mutation
   this.swapMutation(this.child1w1);
-  this.swapMutation(this.child1w1);
   this.swapMutation(this.child2w1);
-  this.swapMutation(this.child2w2);
-
   //return [child1w1, child2w1];  
 }
 
@@ -273,4 +231,3 @@ GameManager.prototype.swapMutation = function(childw1){
 
 }
 //"weight1[" + i + "][" + j + "]" +
-//if gen=1, gameindex=1, weight1 and weight2 is random number
