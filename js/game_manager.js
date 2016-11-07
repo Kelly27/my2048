@@ -107,12 +107,12 @@ GameManager.prototype.move = function(direction) {
     this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
 
-    if(this.indexGame <= 3){ // stop at 10th game
+    if(this.indexGame <= 10){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
     //parent selection
-    if(this.indexGame == 4){
+    if(this.indexGame == 11){
       var parent1 = this.rouletteSelect(this.fitness);
       var parent2 = this.rouletteSelect(this.fitness);
 
@@ -194,13 +194,14 @@ GameManager.prototype.rouletteSelect = function (fitness){
 GameManager.prototype.crossOver = function (parent1, parent2){
   var p1weight1 = this.gameArray[parent1][0];
   var p2weight1 = this.gameArray[parent2][0];
+  // console.log("check array: " + this.gameArray[parent1][0]);
 
   var p1c2 = p1weight1.splice(14); //get out the other half of weight 1
   var p1c1 = p1weight1;//let the remainder of weight 1 be the chromosome 1
   var p2c2 = p2weight1.splice(14);
   var p2c1 = p2weight1; 
 
-  // console.log("check array: " + this.gameArray);
+  
   // console.log("p1c1: " + p1c1);
   // console.log("p1c2: " + p1c2);
   // console.log("p2c1: " + p2c1);
@@ -221,7 +222,7 @@ GameManager.prototype.swapMutation = function(childw1){
   var b = childw1[Math.round(Math.random()*30)];
   var temp;
   
-  if(r < 0.05){
+  if(r < 0.1){
     temp = a;
     a = b;
     b = temp;

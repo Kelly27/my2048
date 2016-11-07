@@ -155,7 +155,7 @@ AI.prototype.getBest = function() {
     this.prevInput = input;
     console.log("new previous input: " + this.prevInput);
     ////direction-sort biggest value in array m
-    var m = output.indexOf(Math.max(...output));
+    var m = output.indexOf(Math.max.apply(null, output));
     console.log("max output: " + m);
     this.counterAfMax = 0;   //xiaoli(move)
     return {move:[m]};
@@ -163,9 +163,9 @@ AI.prototype.getBest = function() {
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 0){ // invalid move, attempt 2nd biggest output
     console.log("invalid move");
     console.log("previous input: " + this.prevInput + " is same with input: " + input);
-    var maxIndex = output.indexOf(Math.max(...output));   //take the index of max
+    var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
-    var m2 = output.indexOf(Math.max(...output)); // get the 2nd max
+    var m2 = output.indexOf(Math.max.apply(null, output)); // get the 2nd max
     console.log("2nd max output: " + m2);
     this.counterAfMax++;   //xiaoli(move)
     return {move:[m2]};
@@ -173,11 +173,11 @@ AI.prototype.getBest = function() {
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 1){
     console.log("invalid move");
     console.log("previous input: " + this.prevInput + " is same with input: " + input);
-    var maxIndex = output.indexOf(Math.max(...output));   //take the index of max
+    var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
-    maxIndex = output.indexOf(Math.max(...output)); //take the index of 2nd max
+    maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 2nd max
     output[maxIndex] = -Infinity; //replace the 2nd max to -infinity
-    var m3 = output.indexOf(Math.max(...output)); // get the 3th max
+    var m3 = output.indexOf(Math.max.apply(null, output)); // get the 3th max
     console.log("3rd max output: " + m3);
     this.counterAfMax++;
     return {move:[m3]};
@@ -185,13 +185,13 @@ AI.prototype.getBest = function() {
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 2){
     console.log("invalid move");
     console.log("previous input: " + this.prevInput + " is same with input: " + input);
-    var maxIndex = output.indexOf(Math.max(...output));   //take the index of max
+    var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
-    maxIndex = output.indexOf(Math.max(...output)); //take the index of 2nd max
+    maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 2nd max
     output[maxIndex] = -Infinity; //replace the 2nd max to -infinity
-    maxIndex = output.indexOf(Math.max(...output)); //take the index of 3th max
+    maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 3th max
     output[maxIndex] = -Infinity; //replace the 3th max to -infinity
-    var m4 = output.indexOf(Math.max(...output)); // get the 4th max
+    var m4 = output.indexOf(Math.max.apply(null, output)); // get the 4th max
     console.log("4th max output: " + m4);
     this.counterAfMax = 0;
     return {move:[m4]};
