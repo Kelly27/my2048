@@ -274,3 +274,4 @@ GameManager.prototype.swapMutation = function(childw1){
 }
 //"weight1[" + i + "][" + j + "]" +
 //if gen=1, gameindex=1, weight1 and weight2 is random number
+//mark
