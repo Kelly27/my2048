@@ -5,12 +5,20 @@ function GameManager(size, InputManager, Actuator, fitness, gameArray, child1w1,
 
   this.indexGame = 0;
   this.generation = 1;
+
+  this.popSize = 2;
+  this.genSize = 3;
+
   this.fitness = [];
+  this.parentFitness = [];
+  this.childFitness = [];
   this.survivalFitness = [];
 
-  this.gameArray = new Array (10);
-  this.parentArray = new Array (10);
-  this.childArray;
+  this.gameArray = new Array (this.popSize);
+  this.parentArray = new Array (this.popSize);
+  this.childArray = new Array (this.popSize);;
+
+  this.Parent = [];
   this.child1 = [];
   this.child2 = [];
   this.child3 = [];
@@ -23,6 +31,8 @@ function GameManager(size, InputManager, Actuator, fitness, gameArray, child1w1,
   this.child10 = [];
 
   this.running      = false;
+  this.gen1         = false;
+  this.isParent     = true; //this.isParent = false; >>means child
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -45,6 +55,7 @@ function GameManager(size, InputManager, Actuator, fitness, gameArray, child1w1,
   }.bind(this));
 
   this.setup();
+  this.message = " ";
 }
 
 // Restart the game
@@ -70,13 +81,17 @@ GameManager.prototype.setup = function () {
   console.log("Game number: " + this.indexGame);
 
   var w1, w2;
-  if(this.generation == 1) {
+  if(this.generation == 1) { // if (this.gen1 = true)
     w1 = this.setRandWeight1();
     w2 = this.setRandWeight2();   
   }
-  else{
+  else if (this.isParent == true){
     w1 = this.childArray[this.indexGame][0];
     w2 = this.childArray[this.indexGame][1];
+  }
+  else if (this.isParent == false) {
+    w1 = this.Parent[this.indexGame][0];
+    w2 = this.Parent[this.indexGame][1];
   }
 
   this.ai = new AI(this.grid, null, w1, w2);
@@ -128,13 +143,19 @@ GameManager.prototype.move = function(direction) {
     this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
 
-    if(this.indexGame <= 1 && this.generation < 4){ // stop at 10th game
+    if(this.indexGame <= (this.popSize - 1)){ // stop at 10th game
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
       //this.parentArray = this.gameArray;
     }
     //parent selection
-    if(this.indexGame == 2 && this.generation < 4){ //1 generation ends and produce child
+    if(this.indexGame == this.popSize && this.isParent == true){ //1 generation ends and produce child
+      for (var i = 0; i < this.fitness.length; i++) {
+        this.parentFitness[i] = this.fitness[i]
+      };
+       
+      this.parentArray = this.gameArray;
+      console.log("parentArray: " + this.parentArray);
       var x = this.crossOver();
       this.child1 = x[0];
       this.child2 = x[1];
@@ -151,27 +172,72 @@ GameManager.prototype.move = function(direction) {
       // this.child9 = x4[0];
       // this.child10 = x4[1];
       
-      this.childArray = this.getChildArray(); //
-
-      if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      if(this.generation == 2) this.actuator.myConsole2("Fitness: "+ this.fitness + "generation: " + this.generation);
-      if(this.generation == 3) this.actuator.myConsole3("Fitness: "+ this.fitness + "generation: " + this.generation);
-      //if(this.generation == 4) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 5) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
-      // if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
+      this.childArray = this.setChildArray(); 
 
       this.fitness = [];
+      this.indexGame = 0;
+      this.isParent = false;
+
+      //print to html when finish one generation
+      var ms = " ";
+      ms = ms.concat("<br>Generation: " + this.generation + " Parent Fitness: " + this.parentFitness);
+      //this.message = ms;
+      this.actuator.myConsole1(ms);
+      var self = this;
+      setTimeout(function(){self.restart();}, 3000);// game restart by its own 
+    }
+
+    if(this.indexGame == 2 && this.isParent == false){ 
+      //do survival selection among parent and child
+      for (var i = 0; i < this.fitness.length; i++) {
+        this.childFitness[i] = this.fitness[i]
+      };
+      this.childArray = this.gameArray;
+      console.log("parentArray: " + this.parentArray + "childArray: " + this.childArray);
+      var survivedArr = new Array (20);
+      for(var i=0; i<10; i++){
+        survivedArr[i] = this.parentArray[i];
+      }  
+      // for(var i=10, var j=0; i<20 j<10; i++,j++){
+      //   survivedArr[i] = this.parentArray[i];
+      // }  
+      // for(var i=0; i<20; i++){
+      //   for(var j=0; j<10; j++){
+      //     survivedArr[i] = this.parentArray[j];
+      //   }
+      //   for(var j=0; j<10; j++){
+      //     survivedArr[i] = this.childArray[j];
+      //   }
+      // }   
+      survivedArr = survivedArr.concat(this.childArray);
+      console.log("survivedArr: " + this.survivedArr);
+      var survived = new Array(this.popSize);
+
+      survived = this.survialSelection(this.parentFitness, this.childFitness);
+
+      var individual = new Array(this.popSize);
+
+      for(var i = 0; i < this.popSize ; i++){
+        var index = survived[i];
+        individual[index] = survivedArr[index];
+        console.log("individual[index]: " + individual[index]);
+      }
+      this.Parent = this.setParentArray(individual);
       this.indexGame = 0;
       this.generation++;
       console.log("generation: " + this.generation);
 
+      //print to html when finish one generation
+      var ms1 = this.message.concat("<br>Generation: " + this.generation + " Parent Fitness: " + this.parentFitness + " Child Fitness" + this.childFitness);
+      this.actuator.myConsole2(ms1);
+
+      this.isParent = true;
+
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
+    if(this.generation == this.genSize ) this.actuator.myConsole10("Generation " + this.generation + "<br>EA is finished");
+
   }    
   this.actuate();
 }
@@ -223,14 +289,14 @@ GameManager.prototype.setRandWeight2 = function(){
 }
 GameManager.prototype.setGameArr = function() {
 
-  var game = new Array (10);
-  for (var i = 0; i < 10; i++) { 
+  var game = new Array (this.popSize);
+  for (var i = 0; i < this.popSize; i++) { 
     game[i] = new Array(3);
   };
   var weight1 = this.ai.getWeight1();
   var weight2 = this.ai.getWeight2();
   var score = this.score; 
-  for (var i = 0; i <10; i++) {
+  for (var i = 0; i <this.popSize; i++) {
     game[i][0] = weight1;
     game[i][1] = weight2;
     game[i][2] = score;
@@ -248,10 +314,10 @@ GameManager.prototype.setFitness = function(indexGame){
 }
 
 GameManager.prototype.rouletteSelect = function (fitness){
-  console.log("fitness array: "+fitness);
+  //console.log("fitness array: "+fitness);
   var fitness_sum = 0;
   //calculate sum of all fitness
-  for (var i = 0; i <10; i++) {
+  for (var i = 0; i <this.popSize; i++) {
     if (fitness[i] == null) fitness[i] = 0;
     fitness_sum +=fitness[i];
     console.log("sum = "+fitness_sum);
@@ -274,10 +340,10 @@ GameManager.prototype.rouletteSelect = function (fitness){
 }
 
 GameManager.prototype.crossOver = function (){
-  var parent1 = this.rouletteSelect(this.fitness);
-  var parent2 = this.rouletteSelect(this.fitness);
+  var parent1 = this.rouletteSelect(this.parentFitness);
+  var parent2 = this.rouletteSelect(this.parentFitness);
 
-  while(parent2 == parent1) parent2 = this.rouletteSelect(this.fitness); //make sure the parent are different.
+  while(parent2 == parent1) parent2 = this.rouletteSelect(this.parentFitness); //make sure the parent are different.
   console.log("Parent1 = " + parent1);
   console.log("Parent2 = " + parent2);
 
@@ -352,7 +418,8 @@ GameManager.prototype.swapMutation = function(childw1){
 
 }
 
-GameManager.prototype.getChildArray = function(){
+//set the retrieve child into an array
+GameManager.prototype.setChildArray = function(){
   var child = new Array (10);
   for (var i = 0; i < 10; i++) { 
     child[i] = new Array(2);
@@ -371,8 +438,29 @@ GameManager.prototype.getChildArray = function(){
   return child;
 }
 
-GameManager.prototype.setParentArray = function( gameArray){
-  this.parentArray = gameArray;
+//setParentArray retrieved parent from move 
+GameManager.prototype.setParentArray = function(individual){
+  var parent = [];
+  for (var i = 0; i < parent.length; i++) {
+    parent[i] = individual[i];
+    console.log("Parent: " + parent[i]);
+  };
+  return parent;
+}
+GameManager.prototype.getParentArray = function(){
+
+}
+
+GameManager.prototype.survialSelection = function(parentFitness, childFitness){
+  var survivalFitness = [];
+  survivalFitness = parentFitness.concat(childFitness);
+  console.log("survivalFitness: " + survivalFitness)
+  var survived = new Array(this.popSize);
+  for(var i = 0; i < this.popSize ; i++){
+    survived[i] = this.rouletteSelect(survivalFitness);
+  }
+  console.log("survived: " + survived);
+  return survived;
 }
 //"weight1[" + i + "][" + j + "]" +
 //if gen=1, gameindex=1, weight1 and weight2 is random number
