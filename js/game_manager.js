@@ -151,7 +151,7 @@ GameManager.prototype.move = function(direction) {
       // this.child9 = x4[0];
       // this.child10 = x4[1];
       
-      this.childArray = this.getChildArray();
+      this.childArray = this.getChildArray(); //
 
       if(this.generation == 1) this.actuator.myConsole1("Fitness: "+ this.fitness + "generation: " + this.generation);
       if(this.generation == 2) this.actuator.myConsole2("Fitness: "+ this.fitness + "generation: " + this.generation);
