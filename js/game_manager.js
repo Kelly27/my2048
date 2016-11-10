@@ -78,7 +78,7 @@ GameManager.prototype.restart = function () {
 GameManager.prototype.setup = function () {
   this.grid = new Grid(this.size);
   this.grid.addStartTiles();
-  console.log("Game number: " + this.indexGame);
+  console.log("Game number: " + this.indexGame + " Generation: " + this.generation);
 
   var w1, w2;
   if(this.generation == 1) { // if (this.gen1 = true)
@@ -173,70 +173,57 @@ GameManager.prototype.move = function(direction) {
       // this.child10 = x4[1];
       
       this.childArray = this.setChildArray(); 
-
+      //print to html when finish one generation
+      var ms = " ";
+      ms = "Generation: " + this.generation + " Parent Fitness: " + this.parentFitness;
+      this.actuator.myConsole1(ms);
       this.fitness = [];
       this.indexGame = 0;
       this.isParent = false;
 
-      //print to html when finish one generation
-      var ms = " ";
-      ms = ms.concat("<br>Generation: " + this.generation + " Parent Fitness: " + this.parentFitness);
-      //this.message = ms;
-      this.actuator.myConsole1(ms);
+      
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
 
-    if(this.indexGame == 2 && this.isParent == false){ 
+    if(this.indexGame == 2 && this.isParent == false && this.generation < this.genSize){ 
       //do survival selection among parent and child
       for (var i = 0; i < this.fitness.length; i++) {
         this.childFitness[i] = this.fitness[i]
       };
       this.childArray = this.gameArray;
       console.log("parentArray: " + this.parentArray + "childArray: " + this.childArray);
-      var survivedArr = new Array (20);
-      for(var i=0; i<10; i++){
-        survivedArr[i] = this.parentArray[i];
-      }  
-      // for(var i=10, var j=0; i<20 j<10; i++,j++){
-      //   survivedArr[i] = this.parentArray[i];
-      // }  
-      // for(var i=0; i<20; i++){
-      //   for(var j=0; j<10; j++){
-      //     survivedArr[i] = this.parentArray[j];
-      //   }
-      //   for(var j=0; j<10; j++){
-      //     survivedArr[i] = this.childArray[j];
-      //   }
-      // }   
-      survivedArr = survivedArr.concat(this.childArray);
-      console.log("survivedArr: " + this.survivedArr);
-      var survived = new Array(this.popSize);
+      var survivalArr = []; //survivalArr - combination of parent array and child array
+      survivalArr = this.parentArray;
+      survivalArr = survivalArr.concat(this.childArray);
+      console.log("survivalArr: " + survivalArr);
 
+      var survived = new Array(this.popSize);
       survived = this.survialSelection(this.parentFitness, this.childFitness);
 
-      var individual = new Array(this.popSize);
+      var individual = new Array(this.popSize); //those individual survived only
 
       for(var i = 0; i < this.popSize ; i++){
         var index = survived[i];
-        individual[index] = survivedArr[index];
-        console.log("individual[index]: " + individual[index]);
+        individual[i] = survivalArr[index];
+        console.log("individual[i]: " + individual[i]);
       }
-      this.Parent = this.setParentArray(individual);
+      // this.Parent = this.setParentArray(individual);
+      this.Parent = individual;
+
       this.indexGame = 0;
       this.generation++;
       console.log("generation: " + this.generation);
 
-      //print to html when finish one generation
-      var ms1 = this.message.concat("<br>Generation: " + this.generation + " Parent Fitness: " + this.parentFitness + " Child Fitness" + this.childFitness);
-      this.actuator.myConsole2(ms1);
-
       this.isParent = true;
-
+      //print to html when finish one generation
+      var ms1 = "Generation: " + this.generation + " Parent Fitness: " + this.parentFitness + " Child Fitness" + this.childFitness;
+      this.actuator.myConsole2(ms1);
       var self = this;
       setTimeout(function(){self.restart();}, 3000);// game restart by its own 
     }
-    if(this.generation == this.genSize ) this.actuator.myConsole10("Generation " + this.generation + "<br>EA is finished");
+    //stop the EA
+    //if(this.generation == this.genSize ) this.actuator.myConsole10("Generation " + this.generation + "<br>EA is finished");
 
   }    
   this.actuate();
@@ -266,7 +253,7 @@ GameManager.prototype.setRandWeight1 = function(){
   for (var i = 0; i <30; i++) {
     for (var j = 0; j <17; j++) {
       weight1[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-      //console.log("weight1: " + weight1[i][j]);        
+      console.log("weight1: " + weight1[i][j]);        
     }
   }
   return weight1;   
@@ -282,7 +269,7 @@ GameManager.prototype.setRandWeight2 = function(){
   for (var i = 0; i <4; i++) {
     for (var j = 0; j <30; j++) {
       weight2[i][j] = Math.round((Math.random()*2-1) *100) / 100;
-      //console.log("weight2: " + weight2[i][j]);        
+      console.log("weight2: " + weight2[i][j]);        
     }
   }
   return weight2;   
@@ -301,7 +288,7 @@ GameManager.prototype.setGameArr = function() {
     game[i][1] = weight2;
     game[i][2] = score;
   }
-  console.log("Check this.gameArray: " + game[0]);
+  //console.log("Check this.gameArray: " + game[0]);
   return game;
 }
 
@@ -317,7 +304,7 @@ GameManager.prototype.rouletteSelect = function (fitness){
   //console.log("fitness array: "+fitness);
   var fitness_sum = 0;
   //calculate sum of all fitness
-  for (var i = 0; i <this.popSize; i++) {
+  for (var i = 0; i <fitness.length; i++) {
     if (fitness[i] == null) fitness[i] = 0;
     fitness_sum +=fitness[i];
     console.log("sum = "+fitness_sum);
@@ -340,10 +327,10 @@ GameManager.prototype.rouletteSelect = function (fitness){
 }
 
 GameManager.prototype.crossOver = function (){
-  var parent1 = this.rouletteSelect(this.parentFitness);
-  var parent2 = this.rouletteSelect(this.parentFitness);
+  var parent1 = this.rouletteSelect(this.fitness);
+  var parent2 = this.rouletteSelect(this.fitness);
 
-  while(parent2 == parent1) parent2 = this.rouletteSelect(this.parentFitness); //make sure the parent are different.
+  while(parent2 == parent1) parent2 = this.rouletteSelect(this.fitness); //make sure the parent are different.
   console.log("Parent1 = " + parent1);
   console.log("Parent2 = " + parent2);
 

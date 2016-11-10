@@ -147,41 +147,20 @@ HTMLActuator.prototype.setRunButton = function(message) {
 }
 
 HTMLActuator.prototype.myConsole1= function(message) {
-  document.getElementById('my-console1').innerHTML = message;
+  var x =document.createElement("P");
+  var t = document.createTextNode(message);
+  x.appendChild(t);
+  document.getElementById('my-console1').appendChild(x);
 }
 
 HTMLActuator.prototype.myConsole2= function(message) {
-  document.getElementById('my-console2').innerHTML = message;
+  var x =document.createElement("P");
+  var t = document.createTextNode(message);
+  x.appendChild(t);
+  document.getElementById('my-console2').appendChild(x);
 }
 
 HTMLActuator.prototype.myConsole3= function(message) {
-  document.getElementById('my-console3').innerHTML = message;
+  document.getElementById('my-console3').innerHTML = " \ " +message;
 }
 
-HTMLActuator.prototype.myConsole4= function(message) {
-  document.getElementById('my-console4').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole5= function(message) {
-  document.getElementById('my-console5').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole6= function(message) {
-  document.getElementById('my-console6').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole7= function(message) {
-  document.getElementById('my-console7').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole8= function(message) {
-  document.getElementById('my-console8').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole9= function(message) {
-  document.getElementById('my-console9').innerHTML = message;
-}
-
-HTMLActuator.prototype.myConsole10= function(message) {
-  document.getElementById('my-console10').innerHTML = message;
-}
