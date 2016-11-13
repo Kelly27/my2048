@@ -6,7 +6,7 @@ function GameManager(size, InputManager, Actuator, fitness, gameArray, child1w1,
   this.indexGame = 0;
   this.generation = 1;
 
-  this.popSize = 10;
+  this.popSize = 6;
   this.genSize = 10;
 
   this.fitness = [];
@@ -85,9 +85,15 @@ GameManager.prototype.setup = function () {
     w1 = this.setRandWeight1();
     w2 = this.setRandWeight2();   
   }
+  else if (this.generation == 1 && this.isFirstGen == false) {
+    w1 = this.childArray[this.indexGame][0];
+    w2 = this.childArray[this.indexGame][1];
+    console.log("This is Child.");
+    console.log("Check child Array: " + "["+this.indexGame+"]" + this.childArray[this.indexGame]);
+  }
   else if (this.generation >= 1 && this.generation <= this.genSize && this.isFirstGen == false) {
-    w1 = this.parentArray[this.indexGame][0];
-    w2 = this.parentArray[this.indexGame][1];
+    w1 = this.childArray[this.indexGame][0];
+    w2 = this.childArray[this.indexGame][1];
     console.log("This is Child.");
     console.log("Check child Array: " + "["+this.indexGame+"]" + this.childArray[this.indexGame]);
   }
@@ -176,12 +182,12 @@ GameManager.prototype.move = function(direction) {
       var x2 = this.crossOver(this.parentFitness, this.parentArray);
       this.child5 = x2[0];
       this.child6 = x2[1];
-      var x3= this.crossOver(this.parentFitness, this.parentArray);
-      this.child7 = x3[0];
-      this.child8 = x3[1];
-      var x4= this.crossOver(this.parentFitness, this.parentArray);
-      this.child9 = x4[0];
-      this.child10 = x4[1];
+      // var x3= this.crossOver(this.parentFitness, this.parentArray);
+      // this.child7 = x3[0];
+      // this.child8 = x3[1];
+      // var x4= this.crossOver(this.parentFitness, this.parentArray);
+      // this.child9 = x4[0];
+      // this.child10 = x4[1];
 
       this.childArray = this.setChildArray(this.parentFitness, this.parentArray); 
 
@@ -217,18 +223,13 @@ GameManager.prototype.move = function(direction) {
       };
 
       var survived = new Array(this.popSize);
-      survived = this.survialSelection(this.parentFitness, this.childFitness);
+      survived = this.survivalSelection(this.parentFitness, this.childFitness);
 
       var individual = new Array(this.popSize); //those individual survived only
 
-      var ms1 = " ";
-      for(var i = 0; i < this.popSize ; i++){
-        ms1 += " parent: " + this.parentArray[i][2];
-      }
-
       var ms2 = " ";
       for(var i = 0; i < this.popSize ; i++){
-        ms2 += " child: " + this.childArray2[i][2];
+        ms2 += " [" + i + "] " + this.childArray2[i][2];
       }
       //print to html when finish one generation
       var ms = " ";
@@ -265,12 +266,12 @@ GameManager.prototype.move = function(direction) {
       var q3 = this.crossOver(this.parentFitness, this.parentArray);
       this.child5 = q3[0];
       this.child6 = q3[1];
-      var q4= this.crossOver(this.parentFitness, this.parentArray);
-      this.child7 = q4[0];
-      this.child8 = q4[1];
-      var q5= this.crossOver(this.parentFitness, this.parentArray);
-      this.child9 = q5[0];
-      this.child10 = q5[1];
+      // var q4= this.crossOver(this.parentFitness, this.parentArray);
+      // this.child7 = q4[0];
+      // this.child8 = q4[1];
+      // var q5= this.crossOver(this.parentFitness, this.parentArray);
+      // this.child9 = q5[0];
+      // this.child10 = q5[1];
 
       this.childArray = this.setChildArray(); 
 
@@ -527,7 +528,7 @@ GameManager.prototype.getParentArray = function(){
 
 }
 
-GameManager.prototype.survialSelection = function(parentFitness, childFitness){
+GameManager.prototype.survivalSelection = function(parentFitness, childFitness){
   var survivalFitness = [];
   survivalFitness = parentFitness.concat(childFitness);
   console.log("survivalFitness: " + survivalFitness)
@@ -535,13 +536,13 @@ GameManager.prototype.survialSelection = function(parentFitness, childFitness){
   for(var i = 0; i < this.popSize ; i++){
     survived[i] = this.rouletteSelect(survivalFitness);
   }
-  var j = 1;
-  for(j = 1; j < this.popSize ; j++){
-    if(survived[j-1] == survived[j]) 
-      {
-        survived[j] = this.rouletteSelect(survivalFitness);
-        j = 1;
-      }
+  console.log(survived);
+  for(var j = 1; j < this.popSize ; j++){
+    survived.sort();
+    while(survived[j] == survived[j-1]) {
+      survived[j] = this.rouletteSelect(survivalFitness);
+      j = 1;
+    }
   }
   console.log("survived: " + survived);
   return survived;
