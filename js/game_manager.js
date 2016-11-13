@@ -6,8 +6,8 @@ function GameManager(size, InputManager, Actuator, fitness, gameArray, child1w1,
   this.indexGame = 0;
   this.generation = 1;
 
-  this.popSize = 10;
-  this.genSize = 10;
+  this.popSize = 2;
+  this.genSize = 100;
 
   this.fitness = [];
   this.parentFitness = [];
@@ -86,7 +86,10 @@ GameManager.prototype.setup = function () {
     w2 = this.setRandWeight2();   
   }
   else if (this.generation > 1 && this.isParent == true){
-    return;
+    w1 = this.childArray[this.indexGame][0];
+    w2 = this.childArray[this.indexGame][1];
+    console.log("This is Parent.");
+    console.log("Check parent Array: " + this.parentArray);
   }
   else if (this.generation >= 1 && this.isParent == false) {
     w1 = this.childArray[this.indexGame][0];
@@ -143,7 +146,6 @@ GameManager.prototype.move = function(direction) {
     //console.log("Check array: " + this.gameArray[this.indexGame]);
     this.fitness[this.indexGame] = this.setFitness(this.indexGame);
     this.indexGame++;
-    
 
     if(this.indexGame <= (this.popSize - 1)){ // stop at 10th game
 
@@ -159,7 +161,7 @@ GameManager.prototype.move = function(direction) {
       };
       
       for (var i = 0; i < this.popSize; i++) {
-        this.parentArray[i] = this.gameArray[i];
+        this.parentArray[i] = this.gameArray[i]
       };
 
       console.log("parentArray: " + this.parentArray);
@@ -174,18 +176,18 @@ GameManager.prototype.move = function(direction) {
       var x = this.crossOver(); //modify here if number of population is not 10
       this.child1 = x[0];
       this.child2 = x[1];
-      // var x1 = this.crossOver();
-      // this.child3 = x1[0];
-      // this.child4 = x1[1];
-      // var x2 = this.crossOver();
-      // this.child5 = x2[0];
-      // this.child6 = x2[1];
-      // var x3= this.crossOver();
-      // this.child7 = x3[0];
-      // this.child8 = x3[1];
-      // var x4= this.crossOver();
-      // this.child9 = x4[0];
-      // this.child10 = x4[1];
+      var x1 = this.crossOver();
+      this.child3 = x1[0];
+      this.child4 = x1[1];
+      var x2 = this.crossOver();
+      this.child5 = x2[0];
+      this.child6 = x2[1];
+      var x3= this.crossOver();
+      this.child7 = x3[0];
+      this.child8 = x3[1];
+      var x4= this.crossOver();
+      this.child9 = x4[0];
+      this.child10 = x4[1];
 
       this.childArray = this.setChildArray(); 
 
@@ -224,6 +226,31 @@ GameManager.prototype.move = function(direction) {
       survived = this.survialSelection(this.parentFitness, this.childFitness);
 
       var individual = new Array(this.popSize); //those individual survived only
+      // for (var i = 0; i < this.popSize; i++) { 
+      //     individual[i] = new Array(3);
+      // };
+      // var weight1 = this.ai.getWeight1();
+      // var weight2 = this.ai.getWeight2();
+      // var score = this.score; 
+      // for (var i = 0; i <this.popSize; i++) {
+      //   game[i][0] = weight1;
+      //   game[i][1] = weight2;
+      //   game[i][2] = score;
+      // }
+
+      var ms1 = " ";
+      for(var i = 0; i < this.popSize ; i++){
+        ms1 += " parent: " + this.parentArray[i][2];
+      }
+
+      var ms2 = " ";
+      for(var i = 0; i < this.popSize ; i++){
+        ms2 += " child: " + this.childArray2[i][2];
+      }
+      //print to html when finish one generation
+      var ms = " ";
+      ms = "Generation: " + this.generation + "Child(Fitness): " + ms2;
+      this.actuator.myConsole1(ms);
 
       for(var i = 0; i < this.popSize ; i++){
         var index = survived[i];
@@ -234,15 +261,6 @@ GameManager.prototype.move = function(direction) {
       for (var i = 0; i < individual.length; i++) {
         this.childArray[i] = individual[i]
       };
-
-      var ms2 = " ";
-      for(var i = 0; i < this.popSize ; i++){
-        ms2 += " child: " + this.childArray2[i][2];
-      }
-      //print to html when finish one generation
-      var ms = " ";
-      ms = "Generation: " + this.generation + "Child(Fitness): " + ms2;
-      this.actuator.myConsole1(ms);
 
       this.generation++;
       console.log("next generation: " + this.generation);
@@ -256,7 +274,6 @@ GameManager.prototype.move = function(direction) {
       var ms1 = "Generation: " + this.generation + " new Fitness: " + mss;
       this.actuator.myConsole1(ms1);
       this.indexGame = 0;
-
       this.gameArray = new Array(this.popSize);
 
       this.isParent = true;
@@ -489,7 +506,7 @@ GameManager.prototype.survialSelection = function(parentFitness, childFitness){
   for(var i = 0; i < this.popSize ; i++){
     survived[i] = this.rouletteSelect(survivalFitness);
   }
-  for(var i = 1; i <= this.popSize ; i++){
+  for(var i = 1; i < this.popSize ; i++){
     while(survived[i-1] == survived[i]) survived[i] = this.rouletteSelect(survivalFitness);
   }
   console.log("survived: " + survived);
