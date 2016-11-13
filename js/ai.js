@@ -14,7 +14,7 @@ AI.prototype.setInput = function(){
       for(var j=0; j < 4; j++){
         if(this.grid.cells[j][i] !== null){
           var v = this.grid.cells[j][i].value;
-          console.log(v);
+          //- console.log(v);
           input = input.concat(v);
         }
         else{
@@ -24,7 +24,7 @@ AI.prototype.setInput = function(){
       }
     }
   input = input.concat(1);
-  console.log(input);
+  // -console.log(input);
   return input;
 }
 
@@ -72,14 +72,14 @@ AI.prototype.getWeight2 = function(){
 //calculate r value for input-hidden
 AI.prototype.calcRvalue1 = function(input, weight1) {
   var sum = new Array (30);
-  console.log("r value:")
+  // -console.log("r value:")
   for(var i =0; i<30; i++){
     var a = 0;
     for(var j=0; j<17; j++){
       a += Math.round((weight1[i][j] * input[j]) *100) / 100;
       sum[i] = a;        
     }
-    console.log(a);
+    // -console.log(a);
   }
   return sum;
 }
@@ -87,14 +87,14 @@ AI.prototype.calcRvalue1 = function(input, weight1) {
 //calculate r value for hidden-output
 AI.prototype.calcRvalue2 = function(hidden, weight2) {
   var sum = new Array (4);
-  console.log("r value 2:")
+  // -console.log("r value 2:")
   for(var i =0; i<4; i++){
     var a = 0;
     for(var j=0; j<30; j++){
       a += Math.round((weight2[i][j] * hidden[j]) *100) / 100;
       sum[i] = a;
     }
-    console.log(a);
+    // -console.log(a);
   }
   return sum;
 }
@@ -104,13 +104,13 @@ AI.prototype.checkValidMove = function(input, prevInput){ //////////////////////
   for (var i = 0; i < input.length; i++) {
     if (prevInput[i] !== input[i]){  //input different, valid move
       flag = true;
-      console.log("not same - prevInput["+i+"]: " + prevInput[i] + " ; input["+i+"]:" + input[i]);
+      // console.log("not same - prevInput["+i+"]: " + prevInput[i] + " ; input["+i+"]:" + input[i]);
       //console.log(flag);      xiaoli
       break;
     }
     else if (prevInput[i] === input[i]){
       flag = false;//invalid move
-      console.log("same - prevInput["+i+"]: " + prevInput[i] + " ; input["+i+"]:" + input[i]);
+      // console.log("same - prevInput["+i+"]: " + prevInput[i] + " ; input["+i+"]:" + input[i]);
       //console.log(flag);    xiaoli
 
     }
@@ -123,17 +123,17 @@ AI.prototype.getBest = function() {
   var output = [];
   var input = this.setInput();
   //var prevInput = [];
-  console.log("Counter: "+this.counterAfMax);  //xiaoli(move)
+  // -console.log("Counter: "+this.counterAfMax);  //xiaoli(move)
   //r value in array for the equation 1/(1+e^-r) [input-hidden]
   var r = new Array(30);
   r = this.calcRvalue1(input, this.getWeight1());
 
-  console.log("hidden value");
+  // -console.log("hidden value");
   //get hidden value where hidden = 1/(1+e^-r)
   for(var i=0; i < r.length; i++){
     hidden[i] = 1/(1+Math.exp(-r[i]));
     hidden[i] = Math.round(hidden[i]*100)/100;
-    console.log(hidden[i]);
+    // -console.log(hidden[i]);
   }
 
   //console.log("r value(hidden)");
@@ -141,7 +141,7 @@ AI.prototype.getBest = function() {
   //r value in array for the equation 1/(1+e^-r) [hidden-output]
   var r2 = new Array(4);
   r2= this.calcRvalue2(hidden, this.getWeight2());
-  console.log(r2)
+  // -console.log(r2)
 
   console.log("output");
   //get output value where output = 1/(1+e^-r)
@@ -153,41 +153,41 @@ AI.prototype.getBest = function() {
   
   //check next valid move
   if(this.prevInput== null|| this.checkValidMove(input, this.prevInput) == true){ //valid move
-    console.log("Valid move");
-    console.log("previous input: " + this.prevInput + "(null or not same)");
+    // console.log("Valid move");
+    // console.log("previous input: " + this.prevInput + "(null or not same)");
     this.prevInput = input;
-    console.log("new previous input: " + this.prevInput);
+    // console.log("new previous input: " + this.prevInput);
     ////direction-sort biggest value in array m
     var m = output.indexOf(Math.max.apply(null, output));
-    console.log("max output: " + m);
+    // console.log("max output: " + m);
     this.counterAfMax = 0;   //xiaoli(move)
     return {move:[m]};
   }
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 0){ // invalid move, attempt 2nd biggest output
-    console.log("invalid move");
-    console.log("previous input: " + this.prevInput + " is same with input: " + input);
+    // console.log("invalid move");
+    // console.log("previous input: " + this.prevInput + " is same with input: " + input);
     var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
     var m2 = output.indexOf(Math.max.apply(null, output)); // get the 2nd max
-    console.log("2nd max output: " + m2);
+    // console.log("2nd max output: " + m2);
     this.counterAfMax++;   //xiaoli(move)
     return {move:[m2]};
   }
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 1){
-    console.log("invalid move");
-    console.log("previous input: " + this.prevInput + " is same with input: " + input);
+    // console.log("invalid move");
+    // console.log("previous input: " + this.prevInput + " is same with input: " + input);
     var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
     maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 2nd max
     output[maxIndex] = -Infinity; //replace the 2nd max to -infinity
     var m3 = output.indexOf(Math.max.apply(null, output)); // get the 3th max
-    console.log("3rd max output: " + m3);
+    // console.log("3rd max output: " + m3);
     this.counterAfMax++;
     return {move:[m3]};
   }
   else if(this.checkValidMove(input, this.prevInput) == false && this.counterAfMax == 2){
-    console.log("invalid move");
-    console.log("previous input: " + this.prevInput + " is same with input: " + input);
+    // console.log("invalid move");
+    // console.log("previous input: " + this.prevInput + " is same with input: " + input);
     var maxIndex = output.indexOf(Math.max.apply(null, output));   //take the index of max
     output[maxIndex] = -Infinity; //replace the max to -infinity
     maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 2nd max
@@ -195,7 +195,7 @@ AI.prototype.getBest = function() {
     maxIndex = output.indexOf(Math.max.apply(null, output)); //take the index of 3th max
     output[maxIndex] = -Infinity; //replace the 3th max to -infinity
     var m4 = output.indexOf(Math.max.apply(null, output)); // get the 4th max
-    console.log("4th max output: " + m4);
+    // console.log("4th max output: " + m4);
     this.counterAfMax = 0;
     return {move:[m4]};
   }
