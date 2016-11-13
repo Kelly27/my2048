@@ -448,7 +448,7 @@ GameManager.prototype.crossOver = function (fitness, arr){
 
   //do mutation
   this.swapMutation1(child1w1);
-  this.swapMutation1(child1w1);
+  this.swapMutation1(child1w2);
   this.swapMutation2(child2w1);
   this.swapMutation2(child2w2);
 
@@ -459,38 +459,38 @@ GameManager.prototype.crossOver = function (fitness, arr){
 }
 
 GameManager.prototype.swapMutation1 = function(child){
-  console.log("Before mutation: " + child);
   var r = Math.random();
   var r1 = Math.round(Math.random()*30);
   var r2 = Math.round(Math.random()*30);
-  var a = child[r1];
-  var b = child[r2];
   var temp;
   
   if(r < 0.05){
+    console.log("Before mutation: " + child);
     temp = child[r1];
     child[r1] = child[r2];
     child[r2] = temp;
-    console.log("r1 value: " + r1 + "r2 value: " + r2 );//////////////problem here
-    console.log("Mutation done: <br>" + a + "<br>" + b);//////////////problem here
+    console.log("r1 value: " + r1 + "r2 value: " + r2 );
     for(var i = 0; i < child.length; i++){
-      console.log("After mutation: " + child); 
+      console.log("After mutation: " + child[i]); 
       } 
   }
 }
 GameManager.prototype.swapMutation2 = function(child){
+  
   var r = Math.random();
-  var r1 = Math.round(Math.random()*17);
-  var r2 = Math.round(Math.random()*17);
-  var a = child[r1];
-  var b = child[r2];
+  var r1 = Math.round(Math.random()*4);
+  var r2 = Math.round(Math.random()*4);
   var temp;
   
   if(r < 0.05){
-    temp = a;
-    a = b;
-    b = temp;
-    console.log("Mutation done: <br>" + a + "<br>" + b);//////////////problem here
+    console.log("Before mutation: " + child);
+    temp = child[r1];
+    child[r1] = child[r2];
+    child[r2] = temp;
+    console.log("r1 value: " + r1 + "r2 value: " + r2 );
+    for(var i = 0; i < child.length; i++){
+      console.log("After mutation: " + child[i]); 
+      } 
   }
 }
 
@@ -535,11 +535,13 @@ GameManager.prototype.survialSelection = function(parentFitness, childFitness){
   for(var i = 0; i < this.popSize ; i++){
     survived[i] = this.rouletteSelect(survivalFitness);
   }
-  for(var i = 1; i < this.popSize ; i++){
-    while(survived[i-1] == survived[i]) survived[i] = this.rouletteSelect(survivalFitness);
-    for(var j = 1; j < this.popSize ; j++){
-      while(survived[j-1] == survived[j]) survived[j] = this.rouletteSelect(survivalFitness);
-    }
+  var j = 1;
+  for(j = 1; j < this.popSize ; j++){
+    if(survived[j-1] == survived[j]) 
+      {
+        survived[j] = this.rouletteSelect(survivalFitness);
+        j = 1;
+      }
   }
   console.log("survived: " + survived);
   return survived;
