@@ -116,7 +116,7 @@ HTMLActuator.prototype.message = function (won) {
 
   this.clearContainer(this.sharingContainer);
   this.sharingContainer.appendChild(this.scoreTweetButton());
-  twttr.widgets.load();
+  //twttr.widgets.load();
 };
 
 HTMLActuator.prototype.clearMessage = function () {
